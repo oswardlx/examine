@@ -1,0 +1,84 @@
+CREATE TABLE `t_social_examine_status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `info_id` int(11) DEFAULT NULL COMMENT '审批信息id',
+  `e_p_id` int(11) DEFAULT NULL COMMENT '审批id',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` int(11) DEFAULT '0' COMMENT '状态 1已通过，2未通过',
+  `level` int(11) DEFAULT '1' COMMENT '审批级别，1 校级审批，2部门审批人员，3局级审批人员，4财务审批人员',
+  `remarks` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='审核状态表';
+
+
+CREATE TABLE `t_social_examine_person` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `level` int(11) DEFAULT NULL COMMENT '审批级别，1 校级审批，2部门审批人员，3局级审批人员，4财务审批人员',
+  `person_name` varchar(20) DEFAULT NULL,
+  `person_id` int(11) DEFAULT NULL,
+  `identity_id` int(11) DEFAULT NULL,
+  `is_del` int(11) DEFAULT NULL,
+  `office_id` int(11) DEFAULT NULL,
+  `dept_id` int(11) DEFAULT NULL,
+  `org_id` int(11) DEFAULT NULL,
+  `org_type` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='审批人表';
+
+CREATE TABLE `t_social_examine_office` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `office_name` varchar(50) DEFAULT NULL,
+  `org_id` int(11) DEFAULT NULL,
+  `org_type` int(11) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `dept_id` int(11) DEFAULT NULL,
+  `is_del` int(11) DEFAULT '0' COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='审批部门表';
+
+CREATE TABLE `t_social_examine_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `office_id` int(11) DEFAULT NULL COMMENT '科室id',
+  `person_id` int(11) DEFAULT NULL COMMENT '申请人id',
+  `attachment` varchar(100) DEFAULT NULL COMMENT '附件[{"res_id": "100062187"}] 存入resource_myinfo_id数组',
+  `identity_id` int(11) DEFAULT NULL COMMENT '申请人身份',
+  `status` int(11) DEFAULT NULL COMMENT '0未提交，1审批中，2已经通过，3未通过，4已结束',
+  `explain_info` text COMMENT '申请理由',
+  `apply_date` datetime DEFAULT NULL COMMENT '申请时间',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `project_name` varchar(100) DEFAULT NULL COMMENT '项目名称',
+  `project_code` varchar(50) DEFAULT NULL COMMENT '项目编码',
+  `order_code` varchar(50) DEFAULT NULL COMMENT '单据编码',
+  `org_id` int(11) DEFAULT NULL COMMENT '机构id',
+  `org_type` int(11) DEFAULT NULL COMMENT '机构类型',
+  `stage_type` varchar(11) DEFAULT NULL COMMENT '学段分类默认-1 1:小学，2:初中，3:高中，4:完全中学，5:九年一贯制，6:十二年一贯制，7:大学，8:职业，9:幼儿 10：小幼一体  11：小幼初一体',
+  `money` float DEFAULT '0' COMMENT '合计金额',
+  `day_sequence` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='审核信息表';
+
+CREATE TABLE `t_social_examine_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL COMMENT '品牌及规格',
+  `attachment` varchar(100) NOT NULL COMMENT '附件[{"res_id": "100062187"}] 存入resource_myinfo_id数组',
+  `unit` varchar(50) NOT NULL COMMENT '单位',
+  `num` int(11) NOT NULL COMMENT '数量',
+  `total_money` float NOT NULL COMMENT '总金额',
+  `info_id` int(11) DEFAULT NULL COMMENT '详细信息id',
+  `price_money` float DEFAULT NULL COMMENT '单价金额',
+  `thing_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='审核中产品详细信息表';
+
+
+
+## space.conf
+location /dsideal_yy/ypt/space/examine {
+  set $path_uri '/dsideal_yy/ypt/space/examine';
+  set $path_uri_no_permission '/dsideal_yy/space/examine';
+  content_by_lua_file lua/lua_script/space/examine/ctl/ExamineCtl.lua;
+}
+
+
+##start_config.xml   单个路由配置
+<route controllerClass="com.dsideal.space.examine.exceloutput.ExamineController" controllerKey="/space/_examine" type="key"/>
